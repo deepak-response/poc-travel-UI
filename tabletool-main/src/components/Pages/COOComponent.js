@@ -14,6 +14,7 @@ class COOComponent extends Component {
     this.state = {
       dialogOpen: false,
       comment: "",
+      chaperoneName: "",
 
       pendingTasks: pendingTaks,
       tasks: [],
@@ -84,11 +85,20 @@ class COOComponent extends Component {
   }
 
   handleAccept = () => {
-    this.approveAPI({
-      "taskId": this.state.selectedRow.taskId,
-      "userOutcome": "Approve",
-      "comments": this.state.comment,
-    })
+    if (this.state.chaperoneName.trim().length === 0) {
+      toast.error("Please enter Chaperone Name before completing the task")
+    }
+    else {
+      this.approveAPI(
+        {
+          "taskId": this.state.selectedRow.taskId,
+          "userOutcome": "Complete",
+          "chaperoneName": this.state.chaperoneName,
+          "comments": this.state.comment,
+        }
+      )
+    }
+
   };
 
   approveAPI = (creds) => {
@@ -108,7 +118,7 @@ class COOComponent extends Component {
       .then(response => response)
       .then(result => {
         console.log(result);
-        toast.success("Task completed successfully with action Approve");
+        toast.success("Task completed successfully with action Complete");
         this.handleDialogClose();
         this.getTasks();
       })
@@ -131,16 +141,24 @@ class COOComponent extends Component {
 
   handleDialogOpen = (selectedRow) => {
     var comment = "";
+    var chaperoneName: "";
     if (selectedRow.taskData.comments === undefined) {
       comment = "";
     }
     else {
       comment = selectedRow.taskData.comments;
     }
+    if (selectedRow.taskData.chaperoneName === undefined) {
+      chaperoneName = "";
+    }
+    else {
+      chaperoneName = selectedRow.taskData.chaperoneName;
+    }
     this.setState({
       dialogOpen: true,
       selectedRow: selectedRow,
       comment: comment,
+      chaperoneName: chaperoneName,
     });
     console.log(selectedRow);
   };
@@ -266,6 +284,18 @@ class COOComponent extends Component {
               <br />
               <TextField
                 variant="filled"
+                name="chaperoneName"
+                value={this.state.chaperoneName}
+                onChange={this.handleInputChange}
+                label="Chaperone Name (Mandatory)"
+                fullWidth
+                required
+                
+              />
+              <br />
+              <br />
+              <TextField
+                variant="filled"
                 name="comment"
                 value={this.state.comment}
                 onChange={this.handleInputChange}
@@ -285,20 +315,10 @@ class COOComponent extends Component {
                 }}
                 onClick={this.handleAccept}
               >
-                Approve
+                Complete
               </Button>
 
-              <Button
-                startIcon={<Cancel />}
-                style={{
-                  backgroundColor: "#c62828",
-                  color: "white",
-                  marginRight: "10px",
-                }}
-                onClick={this.handleReject}
-              >
-                Reject
-              </Button>
+
             </div>
           </DialogContent>
         </Dialog>
@@ -327,6 +347,8 @@ class COOComponent extends Component {
                     <th>Division</th>
                     <th>Employee Phone No</th>
                     <th>Employee Type</th>
+                    <th>Queue</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -349,6 +371,8 @@ class COOComponent extends Component {
                         <td>{item.taskData.division}</td>
                         <td>{item.taskData.employeePhnNbr}</td>
                         <td>{item.taskData.employeeType}</td>
+                        <td>{item.taskData.queue}</td>
+                        <td>{item.taskData.status}</td>
                       </tr>
                     ))}
                 </tbody>

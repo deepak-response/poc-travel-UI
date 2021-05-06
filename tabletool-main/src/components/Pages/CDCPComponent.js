@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, TextField } from "@material-ui/core";
+import { Button, Dialog, DialogContent, FormControl, InputLabel, MenuItem, Select, TextField } from "@material-ui/core";
 import { Done, Refresh } from "@material-ui/icons";
 import React, { Component } from "react";
 import toast from "react-hot-toast";
@@ -14,6 +14,8 @@ class CDCPComponent extends Component {
     this.state = {
       dialogOpen: false,
       comment: "",
+
+      status: "Email sent to Employee",
 
       pendingTasks: pendingTaks,
       tasks: [],
@@ -47,6 +49,12 @@ class CDCPComponent extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
+  handleStatusChange = (event) => {
+    this.setState({
+      status: event.target.value,
+    })
+  }
+
   handleReject = () => {
     toast("Reject Action Performed");
     this.handleDialogClose();
@@ -55,8 +63,9 @@ class CDCPComponent extends Component {
   handleAccept = () => {
     this.completeTaskAPI({
       "taskId": this.state.selectedRow.taskId,
-      "userOutcome": "Approve",
+      "userOutcome": "Complete",
       "comments": this.state.comment,
+      "status": this.state.status,
     })
   };
 
@@ -100,11 +109,22 @@ class CDCPComponent extends Component {
 
   handleDialogOpen = (selectedRow) => {
     var comment = "";
+    var status = "";
     if (selectedRow.taskData.comments === undefined) {
       comment = "";
     }
     else {
       comment = selectedRow.taskData.comments;
+    }
+    if (selectedRow.taskData.status === undefined) {
+      status = "";
+    }
+    else {
+      if (selectedRow.taskData.status !== "")
+        status = selectedRow.taskData.status;
+      else
+        status = "Email sent to Employee";
+
     }
     this.setState({
       comment: comment,
@@ -202,8 +222,8 @@ class CDCPComponent extends Component {
           onClose={this.handleDialogClose}
         >
           <DialogContent>
-            <div style={{ textAlign: "center" }}>
-              <Table bordered>
+            <div >
+              <Table bordered style={{ textAlign: "center" }}>
                 <tbody>
                   <tr>
                     <th>Travel Request Id</th>
@@ -229,9 +249,37 @@ class CDCPComponent extends Component {
                     <th>Workplace Country</th>
                     <td>{this.state.selectedRow.taskData.workPlaceCountry}</td>
                   </tr>
+                  <tr>
+                    <th>Queue</th>
+                    <td>{this.state.selectedRow.taskData.queue}</td>
+                  </tr>
+                  <tr>
+                    <th>Status</th>
+                    <td>{this.state.selectedRow.taskData.status}</td>
+                  </tr>
                 </tbody>
               </Table>
               <br />
+              {this.state.selectedRow.taskData.chaperoneName === undefined ? "" : <h1>Chaperone Name: {this.state.selectedRow.taskData.chaperoneName} </h1>}
+              <FormControl style={{ textAlign: "left !important" }}>
+                <InputLabel id="demo-simple-select-label">Status</InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={this.state.status}
+                  onChange={this.handleStatusChange}
+                >
+                  <MenuItem value="Email sent to Employee">Email sent to Employee</MenuItem>
+                  <MenuItem value="Email Response Received">Email Response Received</MenuItem>
+                  <MenuItem value="Response Received from COO">Response Received from COO</MenuItem>
+                  <MenuItem value="Response Not Received">Response Not Received</MenuItem>
+                  <MenuItem value="Response Recorded">Response Recorded</MenuItem>
+                </Select>
+              </FormControl>
+
+              <br />
+              <br />
+
               <TextField
                 variant="filled"
                 name="comment"
@@ -245,17 +293,19 @@ class CDCPComponent extends Component {
               <br />
               <br />
 
-              <Button
-                startIcon={<Done />}
-                style={{
-                  backgroundColor: "#2E7D32",
-                  color: "white",
-                  marginRight: "10px",
-                }}
-                onClick={this.handleAccept}
-              >
-                Complete
+              <div style={{ textAlign: "center" }}>
+                <Button
+                  startIcon={<Done />}
+                  style={{
+                    backgroundColor: "#2E7D32",
+                    color: "white",
+                    marginRight: "10px",
+                  }}
+                  onClick={this.handleAccept}
+                >
+                  Complete
               </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
@@ -284,6 +334,8 @@ class CDCPComponent extends Component {
                     <th>Division</th>
                     <th>Employee Phone No</th>
                     <th>Employee Type</th>
+                    <th>Queue</th>
+                    <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -306,6 +358,8 @@ class CDCPComponent extends Component {
                         <td>{item.taskData.division}</td>
                         <td>{item.taskData.employeePhnNbr}</td>
                         <td>{item.taskData.employeeType}</td>
+                        <td>{item.taskData.queue}</td>
+                        <td>{item.taskData.status}</td>
                       </tr>
                     ))}
                 </tbody>

@@ -2,6 +2,7 @@ import { Button, Dialog, DialogContent, TextField } from "@material-ui/core";
 import { Cancel, Done, Refresh } from "@material-ui/icons";
 import React, { Component } from "react";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 import { Table } from "reactstrap";
 import { APIURL } from "../../constants/APIURL";
 import {
@@ -81,12 +82,12 @@ class SummaryComponent extends Component {
       .then(result => {
         var tasks = [];
         tasks = result;
-        var data= {};
+        var data = {};
         tasks.forEach((item) => {
-          if(data[item.taskData.status] !== undefined)
-          data[item.taskData.status] = data[item.taskData.status] + 1
-          else 
-          data[item.taskData.status] = 1
+          if (data[item.taskData.status] !== undefined)
+            data[item.taskData.status] = data[item.taskData.status] + 1
+          else
+            data[item.taskData.status] = 1
         })
         console.log(data)
 
@@ -110,7 +111,7 @@ class SummaryComponent extends Component {
   componentDidMount() {
     this.getTasks();
 
-    
+
   }
   render() {
     if (this.state.isLoading) {
@@ -206,11 +207,38 @@ class SummaryComponent extends Component {
                   {this.state.tasks.length <= 0
                     ? "No Data to display"
                     : Object.keys(this.state.data).map((item) => (
-                        <tr id="tRow">
+                      item === "Email sent to Employee" ? 
+                        <tr id="tRow" onClick={()  => window.location.href = "/coo"}>
                           <td>{item}</td>
                           <td>{this.state.data[item]}</td>
                         </tr>
-                      ))}
+
+                       : item === "Response Received from COO" ?
+                        
+                          <tr id="tRow" onClick={()  => window.location.href = "/cdcp"}>
+                            <td>{item}</td>
+                            <td>{this.state.data[item]}</td>
+                          </tr>
+
+                         :
+                        item === "Pending CDCP Review" ?
+                          
+                            <tr id="tRow" onClick={()  => window.location.href = "/cdcp"}>
+                              <td>{item}</td>
+                              <td>{this.state.data[item]}</td>
+                            </tr>
+
+                          
+                          :
+
+                          <tr id="tRow">
+                            <td>{item}</td>
+                            <td>{this.state.data[item]}</td>
+                          </tr>
+
+
+
+                    ))}
                 </tbody>
               </Table>
             </div>

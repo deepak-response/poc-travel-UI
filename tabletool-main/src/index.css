@@ -110,3 +110,13 @@ p {
   background-color: #eeeeee;
   cursor: pointer;
 }
+
+#NoHoverLink {
+  color: "black";
+  text-decoration: none;
+}
+
+#NoHoverLink:hover {
+  color: "black";
+  text-decoration: none;
+}
