@@ -16,6 +16,7 @@ class HeaderComponent extends Component {
         <div className="HeaderMainDiv">
           <Container>
             <Row>
+            
               <Col
                 sm
                 className="HeaderItemDiv"
@@ -51,6 +52,19 @@ class HeaderComponent extends Component {
                   <div>
                     <h4>
                       <b>CDCP</b>
+                    </h4>
+                  </div>
+                </Link>
+              </Col>
+              <Col
+                sm
+                className="HeaderItemDiv"
+                id={this.state.selected === "admin" ? "SelectedItemDiv" : ""}
+              >
+                <Link to="/admin" id="NoHoverLink">
+                  <div>
+                    <h4>
+                      <b>ADMIN</b>
                     </h4>
                   </div>
                 </Link>

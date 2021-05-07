@@ -7,6 +7,7 @@ import { APIURL } from "../../constants/APIURL";
 import { pendingTaks } from "../../constants/Task_Details_COO&CDCP";
 import HeaderComponent from "../HeaderComponent";
 import LoadingComponent from "../LoadingComponent";
+import { get, set, update } from "idb-keyval";
 
 class COOComponent extends Component {
   constructor(props) {
@@ -15,6 +16,8 @@ class COOComponent extends Component {
       dialogOpen: false,
       comment: "",
       chaperoneName: "",
+
+      values: {},
 
       pendingTasks: pendingTaks,
       tasks: [],
@@ -50,10 +53,10 @@ class COOComponent extends Component {
 
   handleReject = () => {
     this.rejectAPI({
-      "taskId": this.state.selectedRow.taskId,
-      "userOutcome": "Reject",
-      "comments": this.state.comment,
-    })
+      taskId: this.state.selectedRow.taskId,
+      userOutcome: "Reject",
+      comments: this.state.comment,
+    });
   };
 
   rejectAPI = (creds) => {
@@ -63,42 +66,38 @@ class COOComponent extends Component {
     var raw = JSON.stringify(creds);
 
     var requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: 'follow'
+      redirect: "follow",
     };
 
     fetch(APIURL + "travel-poc/completeTask", requestOptions)
-      .then(response => response)
-      .then(result => {
+      .then((response) => response)
+      .then((result) => {
         console.log(result);
         toast.success("Task completed successfully with action Reject");
         this.handleDialogClose();
         this.getTasks();
       })
-      .catch(error => {
-        console.log('error', error);
+      .catch((error) => {
+        console.log("error", error);
         toast.error("Server Error");
         this.handleDialogClose();
       });
-  }
+  };
 
   handleAccept = () => {
     if (this.state.chaperoneName.trim().length === 0) {
-      toast.error("Please enter Chaperone Name before completing the task")
+      toast.error("Please enter Chaperone Name before completing the task");
+    } else {
+      this.approveAPI({
+        taskId: this.state.selectedRow.taskId,
+        userOutcome: "Complete",
+        chaperoneName: this.state.chaperoneName,
+        comments: this.state.comment,
+      });
     }
-    else {
-      this.approveAPI(
-        {
-          "taskId": this.state.selectedRow.taskId,
-          "userOutcome": "Complete",
-          "chaperoneName": this.state.chaperoneName,
-          "comments": this.state.comment,
-        }
-      )
-    }
-
   };
 
   approveAPI = (creds) => {
@@ -108,26 +107,26 @@ class COOComponent extends Component {
     var raw = JSON.stringify(creds);
 
     var requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: myHeaders,
       body: raw,
-      redirect: 'follow'
+      redirect: "follow",
     };
 
     fetch(APIURL + "travel-poc/completeTask", requestOptions)
-      .then(response => response)
-      .then(result => {
+      .then((response) => response)
+      .then((result) => {
         console.log(result);
         toast.success("Task completed successfully with action Complete");
         this.handleDialogClose();
         this.getTasks();
       })
-      .catch(error => {
-        console.log('error', error);
+      .catch((error) => {
+        console.log("error", error);
         toast.error("Server Error");
         this.handleDialogClose();
       });
-  }
+  };
 
   handleInputChange(event) {
     const target = event.target;
@@ -141,17 +140,15 @@ class COOComponent extends Component {
 
   handleDialogOpen = (selectedRow) => {
     var comment = "";
-    var chaperoneName: "";
+    var chaperoneName = "";
     if (selectedRow.taskData.comments === undefined) {
       comment = "";
-    }
-    else {
+    } else {
       comment = selectedRow.taskData.comments;
     }
     if (selectedRow.taskData.chaperoneName === undefined) {
       chaperoneName = "";
-    }
-    else {
+    } else {
       chaperoneName = selectedRow.taskData.chaperoneName;
     }
     this.setState({
@@ -197,43 +194,56 @@ class COOComponent extends Component {
   getTasks = () => {
     this.setState({
       isLoading: true,
-    })
+    });
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     // var urlencoded = new URLSearchParams();
+    get("adminValues").then((val) => {
+      if (val !== undefined) {
+        this.setState({
+          values: val,
+        });
+      }
+      console.log(val);
+    });
 
     var requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: myHeaders,
 
-      redirect: 'follow'
+      redirect: "follow",
     };
 
     fetch(APIURL + "travel-poc/getPendingTasks", requestOptions)
-      .then(response => response.json())
-      .then(result => {
+      .then((response) => response.json())
+      .then((result) => {
         var tasks = [];
         tasks = result.filter((item) => item.taskDefKey === "COO");
+        get("adminValues").then((val) => {
+          if (val !== undefined) {
+            this.setState({
+              values: val,
+            });
+          }
+          console.log(val);
+        });
         this.setState({
           tasks: tasks,
           isLoading: false,
         });
       })
-      .catch(error => {
-        console.log('error', error);
+      .catch((error) => {
+        console.log("error", error);
         this.setState({
           isLoading: false,
-        })
+        });
         toast.error("Server Error");
       });
-
   };
 
   componentDidMount() {
     this.getTasks();
-
-
   }
   render() {
     if (this.state.isLoading) {
@@ -290,7 +300,6 @@ class COOComponent extends Component {
                 label="Chaperone Name (Mandatory)"
                 fullWidth
                 required
-                
               />
               <br />
               <br />
@@ -317,8 +326,6 @@ class COOComponent extends Component {
               >
                 Complete
               </Button>
-
-
             </div>
           </DialogContent>
         </Dialog>
@@ -327,7 +334,11 @@ class COOComponent extends Component {
 
           <div className="SummaryContentDiv">
             <div style={{ textAlign: "right" }}>
-              <Button startIcon={<Refresh />} variant="contained" onClick={this.getTasks}>
+              <Button
+                startIcon={<Refresh />}
+                variant="contained"
+                onClick={this.getTasks}
+              >
                 Refresh
               </Button>
             </div>
@@ -335,46 +346,46 @@ class COOComponent extends Component {
               <Table id="SummTable" bordered>
                 <thead>
                   <tr>
-                    <th>Travel Rq Id</th>
-                    <th>Employee Pid</th>
-                    <th>Employee Name</th>
-                    <th>Aging (Travel Days)</th>
-                    <th>Employee Dept Code</th>
-                    <th>Employee Dept Name</th>
-                    <th>Workplace Country</th>
-                    <th>Row Order</th>
-                    <th>Destination Id</th>
-                    <th>Division</th>
-                    <th>Employee Phone No</th>
-                    <th>Employee Type</th>
-                    <th>Queue</th>
-                    <th>Status</th>
+                    {this.state.values.coo !== undefined &&
+                      Object.keys(this.state.values.coo).map(
+                        (item) =>
+                          this.state.values.coo[item].active === true && (
+                            <th>{this.state.values.coo[item].name}</th>
+                          )
+                      )}
                   </tr>
                 </thead>
                 <tbody>
                   {this.state.tasks.length <= 0
                     ? "No Tasks"
                     : this.state.tasks.map((item) => (
-                      <tr
-                        id="tRow"
-                        onClick={() => this.handleDialogOpen(item)}
-                      >
-                        <td>{item.taskData.travelRequestId}</td>
-                        <td>{item.taskData.employeePID}</td>
-                        <td>{item.taskData.employeeName}</td>
-                        <td>{item.taskData.aging}</td>
-                        <td>{item.taskData.empDeptCode}</td>
-                        <td>{item.taskData.empDeptName}</td>
-                        <td>{item.taskData.workPlaceCountry}</td>
-                        <td>{item.taskData.rowOrder}</td>
-                        <td>{item.taskData.destinationId}</td>
-                        <td>{item.taskData.division}</td>
-                        <td>{item.taskData.employeePhnNbr}</td>
-                        <td>{item.taskData.employeeType}</td>
-                        <td>{item.taskData.queue}</td>
-                        <td>{item.taskData.status}</td>
-                      </tr>
-                    ))}
+                        <tr
+                          id="tRow"
+                          onClick={() => this.handleDialogOpen(item)}
+                        >
+                          {Object.keys(this.state.values.coo).map(
+                            (key) =>
+                              this.state.values.coo[key].active === true && (
+                                <td>{item.taskData[key]}</td>
+                              )
+                          )}
+
+                          {/* <td>{item.taskData.travelRequestId}</td>
+                          <td>{item.taskData.employeePID}</td>
+                          <td>{item.taskData.employeeName}</td>
+                          <td>{item.taskData.aging}</td>
+                          <td>{item.taskData.empDeptCode}</td>
+                          <td>{item.taskData.empDeptName}</td>
+                          <td>{item.taskData.workPlaceCountry}</td>
+                          <td>{item.taskData.rowOrder}</td>
+                          <td>{item.taskData.destinationId}</td>
+                          <td>{item.taskData.division}</td>
+                          <td>{item.taskData.employeePhnNbr}</td>
+                          <td>{item.taskData.employeeType}</td>
+                          <td>{item.taskData.queue}</td>
+                          <td>{item.taskData.status}</td> */}
+                        </tr>
+                      ))}
                 </tbody>
               </Table>
             </div>

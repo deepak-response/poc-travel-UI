@@ -85,13 +85,17 @@ p {
 }
 
 .SummaryTableDiv {
-  margin: 30px;
+  
   margin-top: 60px;
+  overflow-x: auto;
+  width: 100%;
 }
 
 #SummTable {
+  padding: 4px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
   font-family: "Monda", sans-serif;
+  
 }
 
 #SummTable thead {
@@ -119,4 +123,8 @@ p {
 #NoHoverLink:hover {
   color: "black";
   text-decoration: none;
+}
+
+.AdminAccordMainDiv {
+  margin-top: 60px;
 }
