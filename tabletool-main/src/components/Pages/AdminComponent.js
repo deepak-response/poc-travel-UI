@@ -378,7 +378,7 @@ class AdminComponent extends Component {
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
-                  <h3 className="display-6">STATUS</h3>
+                  <h3 className="display-6">Manage Travel Status</h3>
                 </AccordionSummary>
                 <AccordionDetails>
                   <div>
@@ -439,7 +439,7 @@ class AdminComponent extends Component {
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
-                  <h3 className="display-6">COO</h3>
+                  <h3 className="display-6">Manage Views - COO Tasks</h3>
                 </AccordionSummary>
                 <AccordionDetails>
                   <div>
@@ -493,7 +493,7 @@ class AdminComponent extends Component {
                   aria-controls="panel1a-content"
                   id="panel1a-header"
                 >
-                  <h3 className="display-6">CDCP</h3>
+                  <h3 className="display-6">Manage Views - CDCP Tasks</h3>
                 </AccordionSummary>
                 <AccordionDetails>
                   <div>

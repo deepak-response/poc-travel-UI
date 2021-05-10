@@ -200,12 +200,14 @@ class CDCPComponent extends Component {
     fetch(APIURL + "travel-poc/getPendingTasks", requestOptions)
       .then((response) => response.json())
       .then((result) => {
+        console.log(result);
         var tasks = [];
         tasks = result.filter((item) => item.taskDefKey === "CDCP");
         get("adminValues").then((val) => {
           if (val !== undefined) {
             this.setState({
               values: val,
+              tasks: tasks,
             });
           }
           console.log(val);
@@ -382,17 +384,17 @@ class CDCPComponent extends Component {
                   {this.state.tasks.length <= 0
                     ? "No Tasks"
                     : this.state.tasks.map((item) => (
-                        <tr
-                          id="tRow"
-                          onClick={() => this.handleDialogOpen(item)}
-                        >
-                          {Object.keys(this.state.values.cdcp).map(
-                            (key) =>
-                              this.state.values.cdcp[key].active === true && (
-                                <td>{item.taskData[key]}</td>
-                              )
-                          )}
-                          {/* <td>{item.taskData.travelRequestId}</td>
+                      <tr
+                        id="tRow"
+                        onClick={() => this.handleDialogOpen(item)}
+                      >
+                        {Object.keys(this.state.values.cdcp).map(
+                          (key) =>
+                            this.state.values.cdcp[key].active === true && (
+                              <td>{item.taskData[key]}</td>
+                            )
+                        )}
+                        {/* <td>{item.taskData.travelRequestId}</td>
                           <td>{item.taskData.employeePID}</td>
                           <td>{item.taskData.employeeName}</td>
                           <td>{item.taskData.aging}</td>
@@ -406,8 +408,8 @@ class CDCPComponent extends Component {
                           <td>{item.taskData.employeeType}</td>
                           <td>{item.taskData.queue}</td>
                           <td>{item.taskData.status}</td> */}
-                        </tr>
-                      ))}
+                      </tr>
+                    ))}
                 </tbody>
               </Table>
             </div>
